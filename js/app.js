@@ -86,11 +86,21 @@ $(function() {
         offsetY=canvasOffset.top;
     }
 
+    function handleTapMove(e)
+    {
+        canMouseX=parseInt(e.clientX-offsetX);
+        canMouseY=parseInt(e.clientY-offsetY);
+        ctx.clearRect(0,0,canvasWidth,canvasHeight);
+        ctx.drawImage(img,canMouseX-128/2,canMouseY-120/2,128,120);
+    }
+
     $("#canvas").mousedown(function(e){handleMouseDown(e);});
     $("#canvas").mousemove(function(e){handleMouseMove(e);});
     $("#canvas").mouseup(function(e){handleMouseUp(e);});
     $("#canvas").mouseout(function(e){handleMouseOut(e);});
     $("#canvas").click(function(e) {handleClick(e);});
+    $("#canvas").on("touchmove",function(e){handleTapMove(e);});
+
     $(window).resize(function(e){handleResize(e)});
 
 });

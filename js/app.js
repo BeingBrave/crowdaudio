@@ -13,6 +13,7 @@ $(function() {
     var offsetY = canvasOffset.top;
     var isDragging = false;
     var canMouseX, canMouseY;
+    var isDirty = false;
     
     var selectedId = 1;
     var nodes = [];
@@ -36,20 +37,39 @@ $(function() {
 
     
     function handleMouseDown(e) {
-        updateNode(e);
         // set the drag flag
         isDragging=true;
     }
 
     function handleMouseUp(e) {
-        updateNode(e);
         // clear the drag flag
         isDragging=false;
     }
 
-    function handleMouseOut(e){ updateNode(e); }
+    function handleMouseOut(e){ isDragging = false; }
 
-    function handleMouseMove(e){ updateNode(e); }
+    function handleMouseMove(e){
+        if(isDragging) updateNode(e);
+    }
+
+
+    function handleClick(e) { updateNode(e); }
+
+    function handleTapMove(e) {
+        e.preventDefault();
+        var touch = e.originalEvent.touches[0] || e.originalEvent.changedTouches[0];
+        var elm = $(this).offset();
+        var x = touch.pageX - elm.left;
+        var y = touch.pageY - elm.top;
+        if(x < $(this).width() && x > 0){
+            if(y < $(this).height() && y > 0){
+                updateNode({
+                    clientX: touch.pageX,
+                    clientY: touch.pageY
+                });
+            }
+        }
+    }
     
     function updateNode(e){
         canMouseX = parseInt(e.clientX-offsetX);
@@ -60,15 +80,12 @@ $(function() {
         selectedNode.x = x;//the x value gets updated for only selected node
         selectedNode.y = y;//the y value now gets the current y value
         
-        redraw();
-    }
-
-
-    function handleClick(e) {
-        updateNode(e);
+        isDirty = true;
     }
     
     function redraw() {
+        if(!isDirty) return;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         var imageWidth = 0.1 * canvas.width;
@@ -80,6 +97,8 @@ $(function() {
             
             ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight)
         }
+
+        isDirty = false;
     }
 
     function handleResize(e) {
@@ -95,22 +114,20 @@ $(function() {
         offsetY = canvasOffset.top;
     }
 
-    function handleTapMove(e)
-    {
-        canMouseX=parseInt(e.clientX-offsetX);
-        canMouseY=parseInt(e.clientY-offsetY);
-        ctx.clearRect(0,0,canvasWidth,canvasHeight);
-        ctx.drawImage(img,canMouseX-128/2,canMouseY-120/2,128,120);
-    }
-
     $("#canvas").mousedown(function(e){handleMouseDown(e);});
     $("#canvas").mousemove(function(e){handleMouseMove(e);});
     $("#canvas").mouseup(function(e){handleMouseUp(e);});
     $("#canvas").mouseout(function(e){handleMouseOut(e);});
     $("#canvas").click(function(e) {handleClick(e);});
-    $("#canvas").on("touchmove",function(e){handleTapMove(e);});
+    $("#canvas").on("touchmove",handleTapMove);
 
     $(window).resize(function(e){handleResize(e)});
 
     handleResize();
+
+    function tick() {
+        redraw();
+        window.requestAnimationFrame(tick);
+    }
+    window.requestAnimationFrame(tick)
 });

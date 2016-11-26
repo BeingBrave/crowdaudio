@@ -1,10 +1,15 @@
 import '../css/app.scss';
 import $ from "jquery";
+import './network';
 import './player'
+import Sync from './sync';
 
 $(function() {
     var img = new Image();
     img.src = "http://images.christmastimeclipart.com/images/2/1271716593176_1788/img_1271716593176_17881.jpg";
+
+    let sync = new Sync("/sync");
+    sync.start();
 
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
@@ -14,11 +19,11 @@ $(function() {
     var isDragging = false;
     var canMouseX, canMouseY;
     var isDirty = true;
-    
+
     var selectedId = 1;
     var nodes = [];
-    
-    
+
+
     //test
     nodes.push({
         id: 1,
@@ -43,7 +48,7 @@ $(function() {
         return null;
     }
 
-    
+
     function handleMouseDown(e) {
         updateSelected(e);
         // set the drag flag
@@ -95,7 +100,7 @@ $(function() {
             }
         }
     }
-    
+
     function updateNode(e){
         canMouseX = parseInt(e.clientX-offsetX);
         canMouseY = parseInt(e.clientY-offsetY);
@@ -104,24 +109,24 @@ $(function() {
         var selectedNode = findNode(selectedId);
         selectedNode.x = x;//the x value gets updated for only selected node
         selectedNode.y = y;//the y value now gets the current y value
-        
+
         isDirty = true;
     }
-    
+
     function redraw() {
         if(!isDirty) return;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
+
         var imageWidth = 0.1 * canvas.width;
         var imageHeight = 0.1 * canvas.height;
-        
+
         for(var i = 0; i < nodes.length; i++) {
             var pixelX = nodes[i].x*canvas.width;
             var pixelY = nodes[i].y*canvas.height;
-            
+
             ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
-            ctx.fillText(nodes[i].id, nodes[i].x, nodes[i].y, 10);
+            ctx.fillText(nodes[i].id, pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
         }
 
         isDirty = false;

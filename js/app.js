@@ -51,6 +51,17 @@ $(function() {
     function handleMouseMove(e){
         if(isDragging) updateNode(e);
     }
+    //function that takes a node and it finds the distance to all other nodes for loop to get distance from node i to all other
+    function distanceFromNodes(node){
+    for (var i = 0; i < nodes.length; i++){
+        //diff in x sqrt diff in y sqrt
+        if(node.id != nodes[i].id){
+
+        var diffx = Math.pow(node.x - nodes[i].x,2)
+        var diffy = Math.pow(node.y - nodes[i].y,2)
+        var distance = Math.sqrt(diffx + diffy)
+}
+    }
 
 
     function handleClick(e) { updateNode(e); }
@@ -79,6 +90,7 @@ $(function() {
         var selectedNode = findNode(selectedId);
         selectedNode.x = x;//the x value gets updated for only selected node
         selectedNode.y = y;//the y value now gets the current y value
+        
         
         isDirty = true;
     }

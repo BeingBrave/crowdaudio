@@ -13,30 +13,39 @@ $(function() {
     var offsetY = canvasOffset.top;
     var isDragging = false;
     var canMouseX, canMouseY;
-    var isDirty = false;
+    var isDirty = true;
     
     var selectedId = 1;
     var nodes = [];
     
     
     //test
-    var node = {
+    nodes.push({
         id: 1,
         x: 0.5,
         y: 0.5
-    }
-    nodes.push(node);
+    });
+    nodes.push({
+        id: 2,
+        x: 0.5,
+        y: 0.4
+    });
+    nodes.push({
+        id: 3,
+        x: 0.2,
+        y: 0.7
+    });
 
     function findNode(id){
         for(var i = 0; i < nodes.length; i++) {
             if(id == nodes[i].id) return nodes[i];
         }
-        console.log("id not found");
         return null;
     }
 
     
     function handleMouseDown(e) {
+        updateSelected(e);
         // set the drag flag
         isDragging=true;
     }
@@ -53,7 +62,23 @@ $(function() {
     }
 
 
-    function handleClick(e) { updateNode(e); }
+    function handleClick(e) {
+        updateSelected(e);
+    }
+
+    function updateSelected(e) {
+        canMouseX = parseInt(e.clientX-offsetX);
+        canMouseY = parseInt(e.clientY-offsetY);
+        var x = canMouseX/canvas.width;//x value between 0-1
+        var y = canMouseY/canvas.height;//y value between 0-1
+        var Node = findID(x, y);
+
+        selectedId = Node.id;
+    }
+
+    function handleTapDown(e) {
+        updateSelected(e);
+    }
 
     function handleTapMove(e) {
         e.preventDefault();
@@ -95,7 +120,8 @@ $(function() {
             var pixelX = nodes[i].x*canvas.width;
             var pixelY = nodes[i].y*canvas.height;
             
-            ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight)
+            ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
+            ctx.fillText(nodes[i].id, nodes[i].x, nodes[i].y, 10);
         }
 
         isDirty = false;
@@ -112,6 +138,18 @@ $(function() {
         canvasOffset = $("#canvas").offset();
         offsetX = canvasOffset.left;
         offsetY = canvasOffset.top;
+
+        isDirty = true;
+    }
+
+    function findID(X, Y)
+    {
+        var marginOfError = 0.1;
+        for(var i = 0; i < nodes.length; i++) {
+            if((X-marginOfError <= nodes[i].x  && X+marginOfError >= nodes[i].x) && (Y-marginOfError <= nodes[i].y && Y+marginOfError >= nodes[i].y)) return nodes[i];
+        }
+
+        return null;
     }
 
     $("#canvas").mousedown(function(e){handleMouseDown(e);});
@@ -119,6 +157,7 @@ $(function() {
     $("#canvas").mouseup(function(e){handleMouseUp(e);});
     $("#canvas").mouseout(function(e){handleMouseOut(e);});
     $("#canvas").click(function(e) {handleClick(e);});
+    $("#canvas").on("touchstart", handleTapDown);
     $("#canvas").on("touchmove",handleTapMove);
 
     $(window).resize(function(e){handleResize(e)});

@@ -5,12 +5,15 @@ const app = require('koa')()
 const router = require('koa-router')()
 const send = require('koa-send')
 const json = require('koa-json')
+const serve = require('koa-static')
 
 const port = process.env.PORT || 3000
 
 router.get('/', function *(){
   yield send(this, 'index.html', { root: __dirname })
 })
+
+app.use(serve('mp3'))
 
 app.use(webpackDevServer({
     config: './webpack.dev.config.js'

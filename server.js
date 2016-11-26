@@ -9,7 +9,7 @@ const json = require('koa-json')
 const port = process.env.PORT || 3000
 
 router.get('/', function *(){
-  yield send(this, 'index.html', { root: __dirname + '/public' })
+  yield send(this, 'index.html', { root: __dirname })
 })
 
 app.use(webpackDevServer({

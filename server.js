@@ -6,7 +6,8 @@ const router = require('koa-router')()
 const send = require('koa-send')
 const json = require('koa-json')
 const microtime = require('microtime')
-const io = new (require( 'koa-socket' ))();
+const io = new (require( 'koa-socket' ))()
+const serve = require('koa-static')
 
 const port = process.env.PORT || 3000
 
@@ -28,6 +29,8 @@ app.io.on( 'join', ( ctx, data ) => {
 app._io.on( 'connection', sock => {
   console.log("hello")
 })
+
+app.use(serve('mp3'))
 
 app.use(webpackDevServer({
     config: './webpack.dev.config.js'

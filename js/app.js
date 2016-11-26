@@ -135,5 +135,4 @@ $(function() {
         window.requestAnimationFrame(tick);
     }
     window.requestAnimationFrame(tick)
->>>>>>> d1e05a8e288f210427e3cf4f9d06937397d2c8d2
 });

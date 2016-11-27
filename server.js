@@ -38,6 +38,7 @@ let nodes = {};
 io.on( 'join', ( ctx, data ) => {
   nodes[data.clientId] = {
     id: data.clientId,
+    type: "client",
     x: 0.5,
     y: 0.5
   };
@@ -48,6 +49,7 @@ io.on( 'join', ( ctx, data ) => {
 io.on( 'updated', ( ctx, data ) => {
   var node = nodes[data.id];
   if(node != null) {
+    node.type == data.type;
     node.x = data.x;
     node.y = data.y;
   }

@@ -1,7 +1,6 @@
 import '../css/app.scss';
 import $ from "jquery";
-import './network';
-import './player'
+import Player from './player';
 import Sync from './sync';
 import Network from './network';
 
@@ -11,8 +10,8 @@ $(function() {
 
     let sync = new Sync("/sync");
     sync.start();
-
     let network = new Network();
+    let player = new Player(sync);
 
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");

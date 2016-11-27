@@ -7,7 +7,7 @@ import Network from './network';
 
 $(function() {
     var img = new Image();
-    img.src = "http://images.christmastimeclipart.com/images/2/1271716593176_1788/img_1271716593176_17881.jpg";
+    img.src = "http://images.clipartpanda.com/speaker-clipart-speaker9.png";
 
     let sync = new Sync("/sync");
     sync.start();

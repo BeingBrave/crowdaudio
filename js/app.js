@@ -126,7 +126,8 @@ $(function() {
     }
 
     function startSong(e) {
-      network.playNode();
+      var node = network.findNodeById(selectedId);
+      if(node != null && node.type == "source") network.playNode(node);
     }
 
     function pauseSong(e) {
@@ -134,7 +135,12 @@ $(function() {
     }
 
     function stopSong(e) {
+      var node = network.findNodeById(selectedId);
+      if(node != null && node.type == "source") network.stopNode(node);
+    }
 
+    function addSource(e) {
+      var node = network.createSource();
     }
 
     $("#canvas").mousedown(function(e){handleMouseDown(e);});
@@ -148,6 +154,7 @@ $(function() {
     $("#play").hide();
     $("#pause").hide();
     $("#stop").hide();
+    $("#add").hide();
 
     $(window).resize(function(e){handleResize(e)});
 
@@ -170,13 +177,19 @@ $(function() {
       $("#play").show();
       $("#pause").show();
       $("#stop").show();
+      $("#add").show();
       $("#play").click(function(e) {startSong(e);});
       $("#pause").click(function(e) {pauseSong(e);});
       $("#stop").click(function(e) {stopSong(e);});
+      $("#add").click(function(e) {addSource(e);});
     })
 
     network.onPlay(function(sourceNode) {
       player.play(sourceNode.id, "dankstorm.mp3");
+    })
+
+    network.onStop(function(sourceNode) {
+      player.stop(sourceNode.id);
     })
 
     network.onUpdate(function(movedNode) { //say moving node 5

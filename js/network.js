@@ -41,6 +41,10 @@ class Network {
       if(that.playCb != null) that.playCb(data);
     });
 
+    this.socket.on('stop', function(data) {
+      if(that.stopCb != null) that.stopCb(data);
+    });
+
     // List of all
     this.socket.on('nodes', function(data) {
       if(data != null) {
@@ -86,16 +90,9 @@ class Network {
     this.playCb = cb;
   }
 
-  // addNode(id, x, y) {
-  //   if(this.findNodeById(id) != null) return;
-  //   var node = {
-  //     id: id,
-  //     x: x,
-  //     y: y
-  //   };
-  //   this.nodes.push(node);
-  //   this.socket.emit("joined", node);
-  // }
+  onStop(cb) {
+    this.stopCb = cb;
+  }
 
   updateNode(node) {
     this.toUpdate.push(node.id);
@@ -158,10 +155,29 @@ class Network {
     return this.nodes[this.clientId];
   }
 
-  playNode(id) {
-    this.socket.emit('play', { // TODO: Add source nodes
-      sourceId: this.clientId
+  playNode(node) {
+    this.socket.emit('play', {
+      sourceId: node.id
     })
+  }
+
+  stopNode(node) {
+    this.socket.emit('stop', {
+      sourceId: node.id
+    })
+  }
+
+  createSource() {
+    var node = {
+      id: guid(),
+      type: "source",
+      x: 0.5,
+      y: 0.5
+    };
+    this.socket.emit("create_source", node);
+    that.nodes[node.id] = node;
+    that.handleUpdate(node);
+    return node;
   }
 
 }

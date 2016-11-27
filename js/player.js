@@ -30,8 +30,8 @@ class Player {
     var channel = this.channels[id];
     if(channel == null) return;
 
-    channel.sound.stop();
-    document.body.removeChild(chanel.sound);
+    channel.sound.pause();
+    //document.body.removeChild(chanel.sound);
   }
 
   setVolume(id, volume) {

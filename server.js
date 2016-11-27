@@ -33,6 +33,7 @@ router.get('/sync', function *(){
 io.attach(app);
 
 let adminId = null;
+let isPlaying = null;
 let nodes = {};
 
 io.on( 'join', ( ctx, data ) => {
@@ -49,6 +50,10 @@ io.on( 'join', ( ctx, data ) => {
     ctx.socket.emit('isAdmin', {admin: true});
     adminId = data.clientId;
   }
+
+  if(isPlaying != null) {
+    ctx.socket.emit('play', nodes[isPlaying]);
+  }
 });
 
 io.on( 'updated', ( ctx, data ) => {
@@ -62,13 +67,20 @@ io.on( 'updated', ( ctx, data ) => {
 });
 
 io.on( 'play', ( ctx, data ) => {
+  isPlaying = data.sourceId;
   var node = nodes[data.sourceId];
-  if(node != null) {
-    node.type == data.type;
-    node.x = data.x;
-    node.y = data.y;
-  }
   io.broadcast('play', node);
+});
+
+io.on( 'stop', ( ctx, data ) => {
+  isPlaying = null;
+  var node = nodes[data.sourceId];
+  io.broadcast('stop', node);
+});
+
+io.on( 'create_source', ( ctx, data ) => {
+  nodes[data.id] = data;
+  io.broadcast('joined', data);
 });
 
 app.use(serve('mp3'))

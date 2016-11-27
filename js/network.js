@@ -1,4 +1,4 @@
-//import io from 'socket.io-client';
+import io from 'socket.io-client';
 
 function guid() {
   function s4() {
@@ -19,70 +19,41 @@ class Network {
       localStorage.setItem('clientId', this.clientId);
     }
 
-    this.admin = false;
-    this.accessManager;
-    this.syncClient;
-    this.syncList;
-    this.nodes = [];
-
     let that = this;
 
-    that.fetchToken(function(data) {
-      that.admin = data.isAdmin;
+    this.socket = io();
+    this.admin = false;
+    this.nodes = {};
+    this.toUpdate = [];
+    this.lastUpdate = -1;
 
-      that.syncClient = new Twilio.Sync.Client(data.token);
-
-      that.syncClient.list('nodes' + data.id).then(function(list) {
-        //Lets store it in our global variable
-        that.syncList = list;
-
-        list.on('itemAdded', function(item) {
-          that.nodes[item.index] = item.value;
-          that.handleUpdate();
-        });
-
-        list.on('itemUpdated', function(item) {
-          that.nodes[item.index] = item.value;
-          that.handleUpdate();
-        });
-
-        list.getItems().then(function(page) {
-          if(page.items != null) {
-            that.nodes = page.items;
-          }
-          that.handleUpdate();
-
-          that.addNode(that.clientId, 0.5, 0.5);
-        });
-      });
-
-      that.accessManager = new Twilio.AccessManager(data.token);
-
-      that.accessManager.on('tokenExpired', refreshToken);
-
-      function refreshToken() {
-        that.fetchToken(setNewToken);
-      }
-
-      //Give Access Manager the new token
-      function setNewToken(tokenResponse) {
-        that.accessManager.updateToken(tokenResponse.token);
-      }
-      //Need to update the Sync Client that the accessManager has a new token
-      that.accessManager.on('tokenUpdated', function() {
-        that.syncClient.updateToken(data.token);
-      });
-
+    // Send on load
+    this.socket.emit('join', {
+      clientId: this.clientId
     })
 
+    // List of all
+    this.socket.on('nodes', function(data) {
+      if(data != null) {
+        that.nodes = data;
+      }
+      that.handleUpdate();
+    });
 
-  }
+    // One joined
+    this.socket.on('joined', function(data) {
+      that.nodes[data.id] = data;
+      that.handleUpdate();
+    });
 
-  fetchToken(handler) {
-    $.getJSON('/token', {
-      clientId: this.clientId
-    }, function (tokenResponse) {
-      handler(tokenResponse);
+    // One updated
+    this.socket.on('updated', function(data) {
+      var node = that.nodes[data.id];
+      if(node != null) {
+        node.x = data.x;
+        node.y = data.y;
+        that.handleUpdate();
+      }
     });
   }
 
@@ -94,33 +65,28 @@ class Network {
     this.updateCb = cb;
   }
 
-  addNode(id, x, y) {
-    if(this.findNodeById(id) != null) return;
-    var node = {
-      id: id,
-      x: x,
-      y: y
-    };
-    this.nodes.push(node);
-    this.syncList.push(node).then(function(item) {
-      console.log('Added: ', item.index);
-    }).catch(function(err) {
-      console.error(err);
-    });
-  }
+  // addNode(id, x, y) {
+  //   if(this.findNodeById(id) != null) return;
+  //   var node = {
+  //     id: id,
+  //     x: x,
+  //     y: y
+  //   };
+  //   this.nodes.push(node);
+  //   this.socket.emit("joined", node);
+  // }#
 
-  updateNode(id, x, y) {
-    var i, foundNode;
-    for(i = 0; i < this.nodes.length; i++) {
-      var node = this.nodes[i];
-      if(id == node.id) {
-        foundNode = node;
-        break;
+  updateNode(node) {
+    this.toUpdate.push(node.id);
+    let now = new Date().getTime();
+    if(this.lastUpdate < now - 60) {
+      this.lastUpdate = now;
+
+      for(var id in this.toUpdate) {
+        this.socket.emit("updated", this.nodes[this.toUpdate[id]]);
       }
+      this.toUpdate = [];
     }
-    foundNode.x = x;
-    foundNode.y = y;
-    this.syncList.update(i,{x: x, y: y});
   }
 
   getNodes() {
@@ -128,8 +94,9 @@ class Network {
   }
 
   findNodeById(id) {
-    for(var i = 0; i < this.nodes.length; i++) {
-      var node = this.nodes[i];
+    for(var nodeId in this.nodes) {
+      if(!this.nodes.hasOwnProperty(nodeId)) continue;
+      var node = this.nodes[nodeId];
       if(id == node.id) return node;
     }
     return null;
@@ -137,11 +104,12 @@ class Network {
 
   findNodeByCoord(x, y) {
     let marginOfError = 0.1;
-    for(var i = 0; i < this.nodes.length; i++) {
-        var node = this.nodes[i];
-        if((x - marginOfError <= node.x  && x + marginOfError >= node.x)
+    for(var nodeId in this.nodes) {
+      if(!this.nodes.hasOwnProperty(nodeId)) continue;
+      var node = this.nodes[nodeId];
+      if((x - marginOfError <= node.x  && x + marginOfError >= node.x)
           && (y - marginOfError <= node.y && y + marginOfError >= node.y))
-          return node;
+        return node;
     }
     return null;
   }

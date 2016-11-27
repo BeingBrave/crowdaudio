@@ -7,8 +7,13 @@ import Network from './network';
 $(function() {
     var img = new Image();
     img.src = "speaker.png";
+
     var selectedSpeaker = new Image();
     selectedSpeaker.src = "selectedSpeaker.png";
+
+    var img2 = new Image();
+    img2.src = "music.svg";
+
 
     let sync = new Sync("/sync");
     sync.start();
@@ -104,12 +109,17 @@ $(function() {
             var node = nodes[nodeId];
             var pixelX = node.x*canvas.width;
             var pixelY = node.y*canvas.height;
-            if(nodeId == selectedId){
+
+            if(nodeId == selectedId) {
                 ctx.drawImage(selectedSpeaker, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
-            }else{
+                ctx.fillText("Device - " + node.id.substring(0,4), pixelX - imageWidth/2, pixelY + imageHeight);
+            } else if (node.type == "source") {
+                ctx.drawImage(img2, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
+                ctx.fillText("Source", pixelX - imageWidth/2, pixelY + imageHeight);
+            } else {
                 ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
+                ctx.fillText("Device - " + node.id.substring(0,4), pixelX - imageWidth/2, pixelY + imageHeight);
             }
-            ctx.fillText(node.id.substring(0,4), pixelX - imageWidth/2, pixelY + imageHeight);
         }
 
         isDirty = false;

@@ -7,6 +7,8 @@ import Network from './network';
 $(function() {
     var img = new Image();
     img.src = "speaker.png";
+    var img2 = new Image();
+    img2.src = "music.svg";
 
     let sync = new Sync("/sync");
     sync.start();
@@ -103,8 +105,18 @@ $(function() {
             var pixelX = node.x*canvas.width;
             var pixelY = node.y*canvas.height;
 
-            ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
-            ctx.fillText(node.id, pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
+            if (node.type=="source")
+            {
+                ctx.drawImage(img2, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
+                ctx.fillText(node.id, pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
+            }
+            else
+            {
+                ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
+                ctx.fillText(node.id, pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
+            }
+
+
         }
 
         isDirty = false;

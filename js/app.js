@@ -6,7 +6,7 @@ import Network from './network';
 
 $(function() {
     var img = new Image();
-    img.src = "http://images.clipartpanda.com/speaker-clipart-speaker9.png";
+    img.src = "speaker.png";
 
     let sync = new Sync("/sync");
     sync.start();

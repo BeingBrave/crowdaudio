@@ -55,6 +55,7 @@ io.on( 'updated', ( ctx, data ) => {
 });
 
 app.use(serve('mp3'))
+app.use(serve('images'))
 
 app.use(webpackDevServer({
     config: './webpack.dev.config.js'

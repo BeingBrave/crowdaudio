@@ -140,6 +140,21 @@ $(function() {
         isDirty = true;
     }
 
+    function startSong(e)
+    {
+
+    }
+
+    function pauseSong(e)
+    {
+
+    }
+
+    function stopSong(e)
+    {
+
+    }
+
     $("#canvas").mousedown(function(e){handleMouseDown(e);});
     $("#canvas").mousemove(function(e){handleMouseMove(e);});
     $("#canvas").mouseup(function(e){handleMouseUp(e);});
@@ -147,6 +162,21 @@ $(function() {
     $("#canvas").click(function(e) {handleClick(e);});
     $("#canvas").on("touchstart", handleTapDown);
     $("#canvas").on("touchmove",handleTapMove);
+
+    if(network.isAdmin())
+    {
+        $("#play").onclick(function(e) {startSong(e);});
+        $("#pause").onclick(function(e) {pauseSong(e);});
+        $("#stop").onclick(function(e) {stopSong(e);});
+    }
+    else
+    {
+        $("#play").hide();
+        $("#pause").hide();
+        $("#stop").hide();
+    }
+
+
 
     $(window).resize(function(e){handleResize(e)});
 

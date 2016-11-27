@@ -211,14 +211,12 @@ $(function() {
        var nodes = network.getSourceNodes();
        if (movedNode.id == network.getMe().id) {
            for (var i = 0; i < nodes.length; i++) {
-               var distance = distanceFromNodes(network.getMe(), nodes[i])
-               var volumeChange = Math.sqrt(distance * 10);
-               player.setVolume(nodes[i].id, volumeChange)
+               var distance = distanceFromNodes(network.getMe(), nodes[i]);
+               player.setVolume(nodes[i].id, 1-Math.sqrt(distance));
            }
        } else if(movedNode.type == "source"){
-           var distance = distanceFromNodes(movedNode, network.getMe())
-           var volumeChange = Math.sqrt(distance * 10);
-           player.setVolume(movedNode.id, volumeChange)
+           var distance = distanceFromNodes(movedNode, network.getMe());
+           player.setVolume(movedNode.id, 1-Math.sqrt(distance));
        }
 
    })

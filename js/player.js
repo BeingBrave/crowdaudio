@@ -10,6 +10,9 @@ class Player {
     var channel = this.channels[id];
     if(channel == null) return;
 
+    // sync.getTime(); // accurate time
+    // realtime // realtime should match accurate time
+    // timestamp // music timestamp
   }
 
   play(id, url) {

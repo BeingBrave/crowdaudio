@@ -178,8 +178,8 @@ class Network {
       y: 0.5
     };
     this.socket.emit("create_source", node);
-    that.nodes[node.id] = node;
-    that.handleUpdate(node);
+    this.nodes[node.id] = node;
+    this.handleUpdate(node);
     return node;
   }
 

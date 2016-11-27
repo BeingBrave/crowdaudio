@@ -50,6 +50,7 @@ class Network {
     this.socket.on('updated', function(data) {
       var node = that.nodes[data.id];
       if(node != null) {
+        node.type = data.type;
         node.x = data.x;
         node.y = data.y;
         that.handleUpdate(node);
@@ -74,7 +75,7 @@ class Network {
   //   };
   //   this.nodes.push(node);
   //   this.socket.emit("joined", node);
-  // }#
+  // }
 
   updateNode(node) {
     this.toUpdate.push(node.id);
@@ -92,6 +93,16 @@ class Network {
 
   getNodes() {
     return this.nodes;
+  }
+
+  getSourceNodes() {
+    let res = {};
+    for(var nodeId in this.nodes) {
+      if(!this.nodes.hasOwnProperty(nodeId)) continue;
+      var node = this.nodes[nodeId];
+      if(node.type == "source") res[nodeId] = node;
+    }
+    return res;
   }
 
   findNodeById(id) {
@@ -121,6 +132,10 @@ class Network {
 
   getId() {
     return this.clientId;
+  }
+
+  getMe() {
+    return this.nodes[this.clientId];
   }
 
 }

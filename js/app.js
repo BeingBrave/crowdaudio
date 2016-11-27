@@ -108,12 +108,12 @@ $(function() {
             if (node.type=="source")
             {
                 ctx.drawImage(img2, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
-                ctx.fillText(node.id, pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
+                ctx.fillText("Source", pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
             }
             else
             {
                 ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
-                ctx.fillText(node.id, pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
+                ctx.fillText("Device", pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
             }
 
 

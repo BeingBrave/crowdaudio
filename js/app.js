@@ -8,6 +8,13 @@ $(function() {
     var img = new Image();
     img.src = "speaker.png";
 
+    var selectedSpeaker = new Image();
+    selectedSpeaker.src = "selectedSpeaker.png";
+
+    var img2 = new Image();
+    img2.src = "music.svg";
+
+
     let sync = new Sync("/sync");
     sync.start();
     let network = new Network();
@@ -103,8 +110,16 @@ $(function() {
             var pixelX = node.x*canvas.width;
             var pixelY = node.y*canvas.height;
 
-            ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
-            ctx.fillText(node.id, pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
+            if(nodeId == selectedId) {
+                ctx.drawImage(selectedSpeaker, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
+                ctx.fillText("Device - " + node.id.substring(0,4), pixelX - imageWidth/2, pixelY + imageHeight);
+            } else if (node.type == "source") {
+                ctx.drawImage(img2, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
+                ctx.fillText("Source", pixelX - imageWidth/2, pixelY + imageHeight);
+            } else {
+                ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
+                ctx.fillText("Device - " + node.id.substring(0,4), pixelX - imageWidth/2, pixelY + imageHeight);
+            }
         }
 
         isDirty = false;
@@ -214,3 +229,6 @@ $(function() {
     }
     window.requestAnimationFrame(tick)
 });
+//fix text under speaker, add another icon for source, show which one is selected, replace top play button with plus to add source
+//find out why source isnt moving
+//image for selected one with red border

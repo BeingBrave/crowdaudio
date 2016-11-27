@@ -1,13 +1,16 @@
 import io from 'socket.io-client';
 
-function guid() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-    s4() + '-' + s4() + s4() + s4();
+function generateUUID(){
+    var d = new Date().getTime();
+    if(window.performance && typeof window.performance.now === "function"){
+        d += performance.now(); //use high-precision timer if available
+    }
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    return uuid;
 }
 
 class Network {
@@ -15,7 +18,7 @@ class Network {
     this.clientId = localStorage.getItem('clientId');
 
     if(!this.clientId) {
-      this.clientId = guid();
+      this.clientId = generateUUID();
       localStorage.setItem('clientId', this.clientId);
     }
 
@@ -169,7 +172,7 @@ class Network {
 
   createSource() {
     var node = {
-      id: guid(),
+      id: generateUUID(),
       type: "source",
       x: 0.5,
       y: 0.5

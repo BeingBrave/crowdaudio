@@ -7,6 +7,8 @@ class Player {
   }
 
   sync(id, timestamp, realtime) {
+    var channel = this.channels[id];
+    if(channel == null) return;
 
   }
 

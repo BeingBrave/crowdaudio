@@ -9,5 +9,5 @@ $(function() {
 
   sound.play();
   sound.volume=0.1;
-
+//playing music in sync,  play pause buttons, event onto listeners
 });

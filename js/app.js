@@ -40,18 +40,6 @@ $(function() {
     function handleMouseMove(e){
         if(isDragging) updateNode(e);
     }
-    // //function that takes a node and it finds the distance to all other nodes for loop to get distance from node i to all other
-    // function distanceFromNodes(node){
-    //   for (var i = 0; i < nodes.length; i++){
-    //     //diff in x sqrt diff in y sqrt
-    //     if(node.id != nodes[i].id){
-    //
-    //     var diffx = Math.pow(node.x - nodes[i].x,2)
-    //     var diffy = Math.pow(node.y - nodes[i].y,2)
-    //     var distance = Math.sqrt(diffx + diffy)
-    //   }
-    //   }
-    // }
 
 
     function handleClick(e) {
@@ -98,8 +86,6 @@ $(function() {
           selectedNode.x = canMouseX/canvas.width;
           selectedNode.y = canMouseY/canvas.height;
           network.updateNode(selectedNode);
-
-          isDirty = true;
         }
     }
 
@@ -181,10 +167,42 @@ $(function() {
     $(window).resize(function(e){handleResize(e)});
 
     handleResize();
+    
+         //function that takes a node and it finds the distance to all other nodes for loop to get distance from node i to all other
+     function distanceFromNodes(node1,node2){
+//       for (var i = 0; i < nodes.length; i++){
+         //diff in x sqrt diff in y sqrt
+//         if(node.id != nodes[i].id){
+    
+         var diffx = Math.pow(node1.x - nodes2.x,2)
+         var diffy = Math.pow(node1.y - nodes2.y,2)
+         var distance = Math.sqrt(diffx + diffy)
+         return distance;
+       }
+     
 
-    network.onUpdate(function(data) {
-      isDirty = true;
-    })
+
+    network.onUpdate(function(movedNode) { //say moving node 5
+       //when a node is changed this is called, is dirty needs to be there
+       //code where if the node is a source then calculate distance of it reference it with network.findNodeById(selectedId)
+       //depending on distance calclulate volume sqrt distance, may need to mulitply by constant before sqrt see what works best
+       isDirty = true; //if are node 5 need to recalculate distance to all sources
+       //if node is the same as selected id, then get all sources and recompute all volumes
+       // else if node is a source, recalculate distance to that source only
+       var nodes = network.getSourceNodes();
+       if (movedNode.id == network.getMe().id) {
+           for (var i = 0; i < nodes.length; i++) {
+               var diffx = Math.pow(movedNode.x - nodes[i].x, 2)
+               var diffy = Math.pow(movedNode.y - nodes[i].y, 2)
+               var distance = Math.sqrt(diffx + diffy)
+               var volumeChange = distance * 10;
+           }
+       } else {
+           var distance = distanceFromNodes(movedNode, network.getMe())
+           var volumeChange = distance * 10;
+       }
+
+   })
 
     function tick() {
         redraw();

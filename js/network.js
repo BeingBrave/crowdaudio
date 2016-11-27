@@ -52,13 +52,13 @@ class Network {
       if(node != null) {
         node.x = data.x;
         node.y = data.y;
-        that.handleUpdate();
+        that.handleUpdate(node);
       }
     });
   }
 
-  handleUpdate() {
-    if(this.updateCb != null) this.updateCb(this.nodes);
+  handleUpdate(node) {
+    if(this.updateCb != null) this.updateCb(node);
   }
 
   onUpdate(cb) {
@@ -78,6 +78,7 @@ class Network {
 
   updateNode(node) {
     this.toUpdate.push(node.id);
+    this.handleUpdate(node);
     let now = new Date().getTime();
     if(this.lastUpdate < now - 60) {
       this.lastUpdate = now;

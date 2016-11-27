@@ -5,7 +5,7 @@ const app = require('koa')()
 const router = require('koa-router')()
 const send = require('koa-send')
 const json = require('koa-json')
-const microtime = require('microtime')
+//const microtime = require('microtime')
 const serve = require('koa-static')
 const io = new (require( 'koa-socket' ))()
 const config = require('./config.js')
@@ -17,7 +17,7 @@ router.get('/', function *(){
 })
 
 router.get('/sync', function *(){
-  this.body = microtime.now();
+  this.body = 0;
 })
 
 io.attach(app);

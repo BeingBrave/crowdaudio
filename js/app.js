@@ -125,18 +125,15 @@ $(function() {
         isDirty = true;
     }
 
-    function startSong(e)
-    {
+    function startSong(e) {
+      network.playNode();
+    }
+
+    function pauseSong(e) {
 
     }
 
-    function pauseSong(e)
-    {
-
-    }
-
-    function stopSong(e)
-    {
+    function stopSong(e) {
 
     }
 
@@ -148,38 +145,39 @@ $(function() {
     $("#canvas").on("touchstart", handleTapDown);
     $("#canvas").on("touchmove",handleTapMove);
 
-    if(network.isAdmin())
-    {
-        $("#play").onclick(function(e) {startSong(e);});
-        $("#pause").onclick(function(e) {pauseSong(e);});
-        $("#stop").onclick(function(e) {stopSong(e);});
-    }
-    else
-    {
-        $("#play").hide();
-        $("#pause").hide();
-        $("#stop").hide();
-    }
-
-
+    $("#play").hide();
+    $("#pause").hide();
+    $("#stop").hide();
 
     $(window).resize(function(e){handleResize(e)});
 
     handleResize();
-    
+
          //function that takes a node and it finds the distance to all other nodes for loop to get distance from node i to all other
      function distanceFromNodes(node1,node2){
 //       for (var i = 0; i < nodes.length; i++){
          //diff in x sqrt diff in y sqrt
 //         if(node.id != nodes[i].id){
-    
+
          var diffx = Math.pow(node1.x - nodes2.x,2)
          var diffy = Math.pow(node1.y - nodes2.y,2)
          var distance = Math.sqrt(diffx + diffy)
          return distance;
        }
-     
 
+
+    network.onAdmin(function() {
+      $("#play").show();
+      $("#pause").show();
+      $("#stop").show();
+      $("#play").click(function(e) {startSong(e);});
+      $("#pause").click(function(e) {pauseSong(e);});
+      $("#stop").click(function(e) {stopSong(e);});
+    })
+
+    network.onPlay(function(sourceNode) {
+      player.play(sourceNode.id, "dankstorm.mp3");
+    })
 
     network.onUpdate(function(movedNode) { //say moving node 5
        //when a node is changed this is called, is dirty needs to be there
@@ -196,7 +194,7 @@ $(function() {
                var distance = Math.sqrt(diffx + diffy)
                var volumeChange = distance * 10;
            }
-       } else {
+       } else if(movedNode.type == "source") {
            var distance = distanceFromNodes(movedNode, network.getMe())
            var volumeChange = distance * 10;
        }

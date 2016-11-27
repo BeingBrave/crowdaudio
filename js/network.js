@@ -32,18 +32,30 @@ class Network {
       clientId: this.clientId
     })
 
+    this.socket.on('isAdmin', function(data) {
+      that.admin = true;
+      if(that.adminCb != null) that.adminCb(data);
+    });
+
+    this.socket.on('play', function(data) {
+      if(that.playCb != null) that.playCb(data);
+    });
+
     // List of all
     this.socket.on('nodes', function(data) {
       if(data != null) {
         that.nodes = data;
+        for(var nodeId in data) {
+          if(!that.nodes.hasOwnProperty(nodeId)) continue;
+          that.handleUpdate(that.nodes[nodeId]);
+        }
       }
-      that.handleUpdate();
     });
 
     // One joined
     this.socket.on('joined', function(data) {
       that.nodes[data.id] = data;
-      that.handleUpdate();
+      that.handleUpdate(data);
     });
 
     // One updated
@@ -62,8 +74,16 @@ class Network {
     if(this.updateCb != null) this.updateCb(node);
   }
 
+  onAdmin(cb) {
+    this.adminCb = cb;
+  }
+
   onUpdate(cb) {
     this.updateCb = cb;
+  }
+
+  onPlay(cb) {
+    this.playCb = cb;
   }
 
   // addNode(id, x, y) {
@@ -138,6 +158,12 @@ class Network {
     return this.nodes[this.clientId];
   }
 
+  playNode(id) {
+    this.socket.emit('play', { // TODO: Add source nodes
+      sourceId: this.clientId
+    })
+  }
+
 }
 
-export { Network as default}
+export { Network as default }

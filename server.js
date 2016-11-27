@@ -42,8 +42,13 @@ io.on( 'join', ( ctx, data ) => {
     x: 0.5,
     y: 0.5
   };
-  io.broadcast('joined', nodes[data.clientId]);
   ctx.socket.emit('nodes', nodes);
+  io.broadcast('joined', nodes[data.clientId]);
+
+  if(adminId == null || adminId == data.clientId) {
+    ctx.socket.emit('isAdmin', {admin: true});
+    adminId = data.clientId;
+  }
 });
 
 io.on( 'updated', ( ctx, data ) => {
@@ -54,6 +59,16 @@ io.on( 'updated', ( ctx, data ) => {
     node.y = data.y;
   }
   io.broadcast('updated', data);
+});
+
+io.on( 'play', ( ctx, data ) => {
+  var node = nodes[data.sourceId];
+  if(node != null) {
+    node.type == data.type;
+    node.x = data.x;
+    node.y = data.y;
+  }
+  io.broadcast('play', node);
 });
 
 app.use(serve('mp3'))

@@ -35,6 +35,10 @@ class Player {
   }
 
   setVolume(id, volume) {
+      if(volume >= 1){
+        volume = 1;
+
+        }
     var channel = this.channels[id];
     if(channel == null) return;
 

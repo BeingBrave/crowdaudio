@@ -6,7 +6,7 @@ import Network from './network';
 
 $(function() {
     var img = new Image();
-    img.src = "http://images.clipartpanda.com/speaker-clipart-speaker9.png";
+    img.src = "speaker.png";
 
     let sync = new Sync("/sync");
     sync.start();
@@ -192,11 +192,14 @@ $(function() {
                var diffx = Math.pow(movedNode.x - nodes[i].x, 2)
                var diffy = Math.pow(movedNode.y - nodes[i].y, 2)
                var distance = Math.sqrt(diffx + diffy)
-               var volumeChange = distance * 10;
+               var volumeChange = Math.sqrt(distance * 10);
+               player.setVolume(nodes[i].id, volumeChange)
            }
-       } else if(movedNode.type == "source") {
+       } else if(movedNode.type == "source"){
            var distance = distanceFromNodes(movedNode, network.getMe())
-           var volumeChange = distance * 10;
+           var volumeChange = Math.sqrt(distance * 10);
+           player.setVolume(movedNode.id, volumeChange)
+
        }
 
    })

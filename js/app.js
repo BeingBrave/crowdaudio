@@ -12,7 +12,7 @@ $(function() {
     sync.start();
     let network = new Network();
     let player = new Player(sync);
-
+    
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
     var canvasOffset = $("#canvas").offset();
@@ -194,11 +194,14 @@ $(function() {
                var diffx = Math.pow(movedNode.x - nodes[i].x, 2)
                var diffy = Math.pow(movedNode.y - nodes[i].y, 2)
                var distance = Math.sqrt(diffx + diffy)
-               var volumeChange = distance * 10;
+               var volumeChange = Math.sqrt(distance * 10);
+               player.setVolume(nodes[i].id, volumeChange)
            }
-       } else {
+       } else if(movedNode.type == "source"){
            var distance = distanceFromNodes(movedNode, network.getMe())
-           var volumeChange = distance * 10;
+           var volumeChange = Math.sqrt(distance * 10);
+           player.setVolume(movedNode.id, volumeChange)
+            
        }
 
    })

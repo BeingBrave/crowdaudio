@@ -3,6 +3,7 @@ import $ from "jquery";
 import './network';
 import './player'
 import Sync from './sync';
+import Network from './network';
 
 $(function() {
     var img = new Image();
@@ -10,6 +11,8 @@ $(function() {
 
     let sync = new Sync("/sync");
     sync.start();
+
+    let network = new Network();
 
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
@@ -19,35 +22,7 @@ $(function() {
     var isDragging = false;
     var canMouseX, canMouseY;
     var isDirty = true;
-
-    var selectedId = 1;
-    var nodes = [];
-
-
-    //test
-    nodes.push({
-        id: 1,
-        x: 0.5,
-        y: 0.5
-    });
-    nodes.push({
-        id: 2,
-        x: 0.5,
-        y: 0.4
-    });
-    nodes.push({
-        id: 3,
-        x: 0.2,
-        y: 0.7
-    });
-
-    function findNode(id){
-        for(var i = 0; i < nodes.length; i++) {
-            if(id == nodes[i].id) return nodes[i];
-        }
-        return null;
-    }
-
+    var selectedId = network.getId();
 
     function handleMouseDown(e) {
         updateSelected(e);
@@ -83,13 +58,15 @@ $(function() {
     }
 
     function updateSelected(e) {
+        if(!network.isAdmin()) return;
+
         canMouseX = parseInt(e.clientX-offsetX);
         canMouseY = parseInt(e.clientY-offsetY);
         var x = canMouseX/canvas.width;//x value between 0-1
         var y = canMouseY/canvas.height;//y value between 0-1
-        var Node = findID(x, y);
+        var node = network.findNodeByCoord(x, y);
 
-        selectedId = Node.id;
+        if(node != null) selectedId = node.id;
     }
 
     function handleTapDown(e) {
@@ -115,13 +92,14 @@ $(function() {
     function updateNode(e){
         canMouseX = parseInt(e.clientX-offsetX);
         canMouseY = parseInt(e.clientY-offsetY);
-        var x = canMouseX/canvas.width;//x value between 0-1
-        var y = canMouseY/canvas.height;//y value between 0-1
-        var selectedNode = findNode(selectedId);
-        selectedNode.x = x;//the x value gets updated for only selected node
-        selectedNode.y = y;//the y value now gets the current y value
+        var selectedNode = network.findNodeById(selectedId);
+        if(selectedNode != null) {
+          selectedNode.x = canMouseX/canvas.width;
+          selectedNode.y = canMouseY/canvas.height;
+          network.updateNode(selectedNode.id, selectedNode.x, selectedNode.y);
 
-        isDirty = true;
+          isDirty = true;
+        }
     }
 
     function redraw() {
@@ -132,12 +110,15 @@ $(function() {
         var imageWidth = 0.1 * canvas.width;
         var imageHeight = 0.1 * canvas.height;
 
-        for(var i = 0; i < nodes.length; i++) {
-            var pixelX = nodes[i].x*canvas.width;
-            var pixelY = nodes[i].y*canvas.height;
+        var nodes = network.getNodes();
+        for(var nodeId in nodes) {
+            if(!nodes.hasOwnProperty(nodeId)) continue;
+            var node = nodes[nodeId];
+            var pixelX = node.x*canvas.width;
+            var pixelY = node.y*canvas.height;
 
             ctx.drawImage(img, pixelX-imageWidth/2,pixelY-imageHeight/2, imageWidth, imageHeight);
-            ctx.fillText(nodes[i].id, pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
+            ctx.fillText(node.id, pixelX - imageWidth/2, pixelY + imageHeight, imageWidth);
         }
 
         isDirty = false;
@@ -158,16 +139,6 @@ $(function() {
         isDirty = true;
     }
 
-    function findID(X, Y)
-    {
-        var marginOfError = 0.1;
-        for(var i = 0; i < nodes.length; i++) {
-            if((X-marginOfError <= nodes[i].x  && X+marginOfError >= nodes[i].x) && (Y-marginOfError <= nodes[i].y && Y+marginOfError >= nodes[i].y)) return nodes[i];
-        }
-
-        return null;
-    }
-
     $("#canvas").mousedown(function(e){handleMouseDown(e);});
     $("#canvas").mousemove(function(e){handleMouseMove(e);});
     $("#canvas").mouseup(function(e){handleMouseUp(e);});
@@ -179,6 +150,10 @@ $(function() {
     $(window).resize(function(e){handleResize(e)});
 
     handleResize();
+
+    network.onUpdate(function(data) {
+      isDirty = true;
+    })
 
     function tick() {
         redraw();

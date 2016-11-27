@@ -1,8 +1,6 @@
 import $ from "jquery";
 
 $(function() {
-
-
   var sound      = document.createElement('audio');
   sound.id       = 'audio-player';
   sound.src      = 'dankstorm.mp3';
@@ -13,4 +11,3 @@ $(function() {
   sound.volume=0.1;
 
 });
-
